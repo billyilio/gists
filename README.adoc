@@ -42,6 +42,8 @@ create (:Service:Rest{endpoint:'http://hotels-v2.stage.api.e-travel.gr',name:'Ho
 match (a:Background_worker{name:'Hotels x-sell_emailer'}), (b:Service {name:'Hotels-v2'})
 create (b)-[:CALL]->(a);
 
+match (a:Service{name:'Refund service'}, (b:Application{name:'Panoramix'})
+create (a)-[:CALLED_BY]->(b);
 
 
 
