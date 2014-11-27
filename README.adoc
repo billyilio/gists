@@ -39,6 +39,10 @@ create (:Service:Rest{endpoint:'http://content-v2.staging.api.e-travel.gr',name:
 create (:Service:Rest{endpoint:'http://hotels-v1.stage.api.e-travel.gr',name:'Hotels-v1'});
 create (:Service:Rest{endpoint:'http://hotels-v2.stage.api.e-travel.gr',name:'Hotels-v2'});
 
+match (a:Background_worker{name:'Hotels x-sell_emailer'}), (b:Service {name:'Hotels-v2'})
+create (b)-[:CALL]->(a);
+
+
 match (a:Service {name: 'flights_service'}), (b:Server {name: 'SDIAK-STAGING'})
 create (a)-[:DEPLOYD_ON]->(b);
 
