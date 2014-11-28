@@ -73,8 +73,8 @@ create (:Background_worker{name:'real_margin'});
 create (:Background_runner{name:'rm_aggregator'});
 create (:Utility{name:'iur_fanout'});
 create (:Service:Rest{endpoint:'http://content_v2.staging.api.e-travel.gr',name:'content_v2'});
-create (:Service:Rest{endpoint:'http://hotels_v1.stage.api.e-travel.gr',name:'hotels_v1'});
-create (:Service:Rest{endpoint:'http://hotels_v2.stage.api.e-travel.gr',name:'hotels_v2'});
+create (:Service:Rest{endpoint:'http://hotels_v1.staging.api.e-travel.gr',name:'hotels_v1'});
+create (:Service:Rest{endpoint:'http://hotels_v2.staging.api.e-travel.gr',name:'hotels_v2'});
 create (:Service:Rest{endpoint:'http://kumquat-v1.staging.api.e-travel.gr/api-v1.0/',name:'kumquat'});
 create (:Database{name:'currency_db'});
 //LeWeb
@@ -643,14 +643,27 @@ create (n)-[:OWNS]->(n2);
 create (:Database{name:'hotels_db'});
 create (:DLL{name:'insurance_old'});
 create (:Service:Rest{name:'mail_to_insurance_company'});
-create (:Service:Rest{name:'mail_to_customers'});
+create (:Service:Rest{name:'mail_to_insurance_customers'});
 create (:Sns{name:'insurance'});
 create (:Sqs{name:'insurance'});
 create (:Service:Rest{Endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&password=wtf_flights',name:'kumquat_api_insurance_production'});
-create (:Service:Rest{Endpoint:'http://kumquat-v1.stage.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_insurance_staging'});
+create (:Service:Rest{Endpoint:'http://kumquat-v1.staging.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_insurance_staging'});
 create (:Service:Rest{Endpoint:'http://insurance-v1.production.api.e-travel.gr/',name:'insurance_new'});
 create (:ScheduledTask{name:'insurance_cli_new'});
 create (:Application:Web{name:'insurance_site'});
+create (:ScheduledTask{name:'hotels_to_crm'});
+create (:Service:Rest{name:'mail_to_hotel_providers'});
+create (:Service:Rest{name:'mail_to_hotel_customers'});
+create (:Sns{name:'hotels'});
+create (:Sqs{name:'insurance'});
+create (:Service:Rest{Endpoint:'http://cars-v2.staging.api.e-travel.gr/',name:'cars_v2'});
+create (:Database{name:'cars_db'});
+create (:ScheduledTask{name:'cars_to_crm'});
+create (:Service:Rest{name:'mail_to_car_providers'});
+create (:Service:Rest{name:'mail_to_car_customers'});
+create (:Sns{name:'cars'});
+create (:Sqs{name:'cars'});
+create (:Service:Rest{Endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/car_reservations?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_cars_production'});
 
 
 match (a:Service{name:'content_v2'}), (b:Application{name:'leweb'})
@@ -663,40 +676,40 @@ match (a:Service{name:'hotels_v2'}), (b:Database{name:'hotels_db'})
 create (a)-[:READS_FROM]->(b);
 
 match (a:Service{name:'hotels_v2'}), (b:DatabaseServer{brand:'couch_db'})
-create (a)[:CALLS]->(b);
+create (a)-[:CALLS]->(b);
 
 match (a:Service:{name:'flights'}), (b:DLL{name:'insurance_old'})
 create (a)-[CALLS]->(b);
 
 match (a:DLL{name:'insurance_old'}), (b:Database{name:'travel_insurances_db'})
-create (a)[STORES_IN]->(b);
+create (a)-[STORES_IN]->(b);
 
-match (a:Database{name:'travel_insurances_db'}), (b:ScheduledTask{name:'insurance_cli_old'})
-create (a)-[SENDS_TO]->(b);
+match (a:ScheduledTask{name:'insurance_cli_old'}), (b:Database{name:'travel_insurances_db''})
+create (a)-[READS_FROM]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_old'}), (b:Application{name:'old_crm'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_old'}), (b:Service{name:'mail_to_insurance_company'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_old'}), (b:Service{name:'mail_to_customers'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_old'}), (b:Sns{name:'insurance'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:Sns{name:'insurance'}), (b:Sqs{name:'insurance'})
-create create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:Service{name:'AWS redrive'}), (b:Sqs{name:'insurance'})
-create (a)[READS_FROM]->(b);
+create (a)-[READS_FROM]->(b);
 
 match (a:Service{name:'AWS redrive'}), (b:Service{name:'kumquat_api_insurance_production'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:Service{name:'AWS redrive'}), (b:Service{name:'kumquat_api_insurance_staging'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:Application{name:'android'}), (b:Service{name:'insurance_new'})
 create (a)-[CALLS]->(b);
@@ -705,48 +718,84 @@ match (a:Application{name:'ios'}), (b:Service{name:'insurance_new'})
 create (a)-[CALLS]->(b);
 
 match (a:Service{name:'insurance_new'}), (b:Database{name:'travel_insurances_db'})
-create (a)[STORES_IN]->(b);
+create (a)-[STORES_IN]->(b);
 
-match (a:Database{name:'travel_insurances_db'}), (b:ScheduledTask{name:'insurance_cli_new'})
-create (a)-[SENDS_TO]->(b);
+match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Database{name:'travel_insurances_db''})
+create (a)-[READS_FROM]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Application{name:'old_crm'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Service{name:'mail_to_insurance_company'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Service{name:'mail_to_customers'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Sns{name:'insurance'})
-create (a)[SENDS_TO]->(b);
+create (a)-[SENDS_TO]->(b);
 
 match (a:Application{name:'insurance_site'}), (b:Database{name:'travel_insurances_db'})
-create (a)[STORES_IN]->(b);
+create (a)-[STORES_IN]->(b);
 
 
 
 
+match (a:Service{name:'hotels_v2'}), (b:Database{name:'hotels_db'})
+create (a)-[STORES_IN]->(b);
+
+match (a:ScheduledTask{name:'hotels_to_crm'}), (b:Database{name:'hotels_db'})
+create (a)-[READS_FROM]->(b);
+
+match (a:ScheduledTask{name:'hotels_to_crm'}), (b:Application{name:'old_crm'})
+create (a)-[SENDS_TO]->(b);
+
+match (a:ScheduledTask{name:'hotels_to_crm'}), (b:Service{name:'mail_to_hotel_providers'})
+create (a)-[SENDS_TO]->(b);
+
+match (a:ScheduledTask{name:'hotels_to_crm'}), (b:Service{name:'mail_to_hotel_customers'})
+create (a)-[SENDS_TO]->(b);
+
+match (a:ScheduledTask{name:'hotels_to_crm'}), (b:Sns{name:'hotels'})
+create (a)-[SENDS_TO]->(b);
+
+match (a:Sns{name:'hotels'}), (b:Sqs{name:'hotels'})
+create (a)-[SENDS_TO]->(b);
+
+match (a:Service{name:'AWS redrive'}), (b:Sqs{name:'hotels'})
+create (a)-[READS_FROM]->(b);
+
+match (a:Service{name:'AWS redrive'}), (b:Service{name:'kumquat'})
+create (a)-[SENDS_TO]->(b);
 
 
 
+match (a:Service{name:'cars_v2'}), (b:Database{name:'cars_db'})
+create (a)-[STORES_IN]->(b);
 
+match  (a:ScheduledTask{name:'cars_to_crm'}), (b:Database{name:'cars_db'})
+create (a)-[READS_FROM]->(b);
 
+match  (a:ScheduledTask{name:'cars_to_crm'}), (b:Application{name:'old_crm'})
+create (a)-[SENDS_TO]->(b);
 
+match  (a:ScheduledTask{name:'cars_to_crm'}), (b:Service{name:'mail_to_car_providers'})
+create (a)-[SENDS_TO]->(b);
 
+match  (a:ScheduledTask{name:'cars_to_crm'}), (b:Service{name:'mail_to_car_customers'})
+create (a)-[SENDS_TO]->(b);
 
+match  (a:ScheduledTask{name:'cars_to_crm'}), (b:Sns{name:'cars'}) 
+create (a)-[SENDS_TO]->(b);
 
+match (a:Sns{name:'cars'}), (b:Sqs{name:'cars'})
+create (a)-[SENDS_TO]->(b);
 
+match (a:Service{name:'AWS redrive'}), (b:Sqs{name:'cars'})
+create (a)-[READS_FROM]->(b);
 
-
-
-
-
-
-
-
-
+match (a:Service{name:'AWS redrive'}), (b:Service{name:'kumquat_api_cars_production'})
+create (a)-[SENDS_TO]->(b);
 
 
 
