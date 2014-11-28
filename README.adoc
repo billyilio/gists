@@ -814,10 +814,10 @@ create (a)-[:CALLS{endpoint:'recommender-v1.production.api/recommendations/hotel
 match (a:Service{name:'recommender'}), (b:Service{name:'pull_from_unified_log_datafeeder'})
 create (a)-[:CALLS]->(b);
 
-match (a:Service{name:pull_from_unified_log_datafeeder'}), (b:Database{name:'recommender_db'})
+match (a:Service{name:'pull_from_unified_log_datafeeder'}), (b:Database{name:'recommender_db'})
 create (a)-[:STORES_IN]->(b);
 
-match (a:Service{name:pull_from_unified_log_datafeeder'}), (b:Database{name:'hotels_db'})
+match (a:Service{name:'pull_from_unified_log_datafeeder'}), (b:Database{name:'hotels_db'})
 create (a)-[:SENDS_TO]->(b);
 
 
