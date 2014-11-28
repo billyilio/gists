@@ -663,8 +663,13 @@ create (:Service:Rest{name:'mail_to_car_providers'});
 create (:Service:Rest{name:'mail_to_car_customers'});
 create (:Sns{name:'cars'});
 create (:Sqs{name:'cars'});
-create (:Service:Rest{Endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/car_reservations?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_cars_production'});
 
+
+
+create (:Service:Rest{Endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/car_reservations?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_cars_production'});
+create (:Service:Rest{Endpoint:'recommender-v1.production.api/recommendations/hotels', name:'recommender'});
+create (:Service:Rest{name:'pull_from_unified_log_datafeeder'});
+create (:Database{name:'recommender_db'});
 
 match (a:Service{name:'content_v2'}), (b:Application{name:'leweb'})
 create (a)-[:CALLED_BY]->(b);
@@ -729,7 +734,7 @@ create (a)-[:SENDS_TO]->(b);
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Service{name:'mail_to_insurance_company'})
 create (a)-[:SENDS_TO]->(b);
 
-match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Service{name:'mail_to_customers'})
+match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Service{name:'mail_to_insurance_customers'})
 create (a)-[:SENDS_TO]->(b);
 
 match (a:ScheduledTask{name:'insurance_cli_new'}), (b:Sns{name:'insurance'})
@@ -796,6 +801,25 @@ create (a)-[:READS_FROM]->(b);
 
 match (a:Service{name:'AWS redrive'}), (b:Service{name:'kumquat_api_cars_production'})
 create (a)-[:SENDS_TO]->(b);
+
+
+
+
+match (a:Service{name:'hotels_v2'}), (b:Database{name:'hotels_db'})
+create (a)-[:STORES_IN{endpoint:'hotels-v2.production.api/recommendations'}]->(b);
+
+match (a:Service{name:'hotels_v2'}), (b:Service{name:'recommender'})
+create (a)-[:CALLS{endpoint:'recommender-v1.production.api/recommendations/hotels'}]->(b);
+
+match (a:Service{name:'recommender'}), (b:Service{name:pull_from_unified_log_datafeeder'})
+create (a)-[:CALLS]->(b);
+
+match (a:Service{name:pull_from_unified_log_datafeeder'}), (b:Database{name:'recommender_db'})
+create (a)-[:STORES_IN]->(b);
+
+match (a:Service{name:pull_from_unified_log_datafeeder'}), (b:Database{name:'hotels_db'})
+create (a)-[:SENDS_TO]->(b);
+
 
 
 
