@@ -646,14 +646,14 @@ create (:Service:Rest{name:'mail_to_insurance_company'});
 create (:Service:Rest{name:'mail_to_customers'});
 create (:Sns{name:'insurance'});
 create (:Sqs{name:'insurance'});
-create (:Service:Rest{endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&password=wtf_flights',name:'kumquat_api_insurance_production'});
-create (:Service:Rest{endpoint:'http://kumquat-v1.stage.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_insurance_staging'});
-create (:Service:Rest{endpoint:'http://insurance-v1.production.api.e-travel.gr/',name:'insurance_new'});
+create (:Service:Rest{Endpoint:'https://kumquat-v1.production.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&password=wtf_flights',name:'kumquat_api_insurance_production'});
+create (:Service:Rest{Endpoint:'http://kumquat-v1.stage.api.e-travel.gr/api-v1.0/en/insurance_contracts?email=services@pamediakopes.gr&;password=wtf_flights',name:'kumquat_api_insurance_staging'});
+create (:Service:Rest{Endpoint:'http://insurance-v1.production.api.e-travel.gr/',name:'insurance_new'});
 create (:ScheduledTask{name:'insurance_cli_new'});
 create (:Application:Web{name:'insurance_site'});
 
 
-match (a:Service{name: 'content_v2'}), (b:Application{name:'leweb'})
+match (a:Service{name:'content_v2'}), (b:Application{name:'leweb'})
 create (a)-[:CALLED_BY]->(b);
 
 match (a:Application {name:'leweb'}), (b:Service {name:'hotels_v2'})
