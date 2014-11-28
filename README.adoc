@@ -811,7 +811,7 @@ create (a)-[:STORES_IN{endpoint:'hotels-v2.production.api/recommendations'}]->(b
 match (a:Service{name:'hotels_v2'}), (b:Service{name:'recommender'})
 create (a)-[:CALLS{endpoint:'recommender-v1.production.api/recommendations/hotels'}]->(b);
 
-match (a:Service{name:'recommender'}), (b:Service{name:pull_from_unified_log_datafeeder'})
+match (a:Service{name:'recommender'}), (b:Service{name:'pull_from_unified_log_datafeeder'})
 create (a)-[:CALLS]->(b);
 
 match (a:Service{name:pull_from_unified_log_datafeeder'}), (b:Database{name:'recommender_db'})
