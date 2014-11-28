@@ -678,7 +678,7 @@ create (a)-[:READS_FROM]->(b);
 match (a:Service{name:'hotels_v2'}), (b:DatabaseServer{brand:'couch_db'})
 create (a)-[:CALLS]->(b);
 
-match (a:Service:{name:'flights'}), (b:DLL{name:'insurance_old'})
+match (a:Service{name:'flights'}), (b:DLL{name:'insurance_old'})
 create (a)-[CALLS]->(b);
 
 match (a:DLL{name:'insurance_old'}), (b:Database{name:'travel_insurances_db'})
