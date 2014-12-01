@@ -671,6 +671,16 @@ create (:Service:Rest{Endpoint:'recommender-v1.production.api/recommendations/ho
 create (:Service:Rest{name:'pull_from_unified_log_datafeeder'});
 create (:Database{name:'recommender_db'});
 
+
+create (:Application:Web{name:'splunk'});
+create (:ScheduledTask{name:'splunk_extractor'});
+create (:Service{name:'shard_processor'});
+create (:Service{name:'data_runner'}); 
+create (:Folder{name:'shards_folder'});
+
+
+
+
 match (a:Service{name:'content_v2'}), (b:Application{name:'leweb'})
 create (a)-[:CALLED_BY]->(b);
 
@@ -822,6 +832,21 @@ create (a)-[:SENDS_TO]->(b);
 
 
 
+
+match (a:ScheduledTask{name:'splunk_extractor'}), (b:Application{name:'splunk'})
+create (a)-[:READS_FROM]->(b);
+
+match (a:Service{name:'shard_processor'}), (b:ScheduledTask{name:'splunk_extractor'})
+create (a)-[:READS_FROM]->(b);
+
+match (a:Service{name:'shard_processor'}), (b:Folder{name:'shards_folder'})
+create (a)-[:STORES_IN]->(b);
+
+match (a:Service{name:'data_runner'}), (b:Folder{name:'shards_folder'})
+create (a)-[:READS_FROM]->(b);
+
+match (a:Service{name:'data_runner'}), (b:DatabaseServer{brand: 'aws_redshift'})
+create (a)-[:STORES_IN]->(b);
 
 ----
 
