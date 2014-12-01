@@ -679,6 +679,15 @@ create (:Service{name:'data_runner'});
 create (:Folder{name:'shards_folder'});
 
 
+create (:Server{name:'skroutz',ip:'10.0.0.228'});
+create (:Sns{name:'iur'});
+create (:Sqs{name:'iur'});
+create (:Sqs{name:'iur_downloader'});
+create (:Sqs{name:'iur_test_accelerators'});
+create (:Folder{name:'iur_backup_folder'});
+create (:Servide{name:'test_accelerators'});
+create (:Application:Web{name:'panoramix_staging'});
+
 
 
 match (a:Service{name:'content_v2'}), (b:Application{name:'leweb'})
@@ -845,8 +854,41 @@ create (a)-[:STORES_IN]->(b);
 match (a:Service{name:'data_runner'}), (b:Folder{name:'shards_folder'})
 create (a)-[:READS_FROM]->(b);
 
-match (a:Service{name:'data_runner'}), (b:DatabaseServer{brand: 'aws_redshift'})
+match (a:Service{name:'data_runner'}), (b:DatabaseServer{brand:'aws_redshift'})
 create (a)-[:STORES_IN]->(b);
+
+
+
+match (a:Service{name:'sabre'}), (b:Server{name:'skroutz',ip:'10.0.0.228'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Server{name:'skroutz',ip:'10.0.0.228'}), (b:Sns{name:'iur'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sns{name:'iur'}), (b:Sqs{name:'iur'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sns{name:'iur'}), (b:Sqs{name:'iur_downloader'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sns{name:'iur'}), (b:Sqs{name:'iur_test_accelerators'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sqs{name:'iur'}), (b:Service{name:'AWS redrive'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sqs{name:'iur_downloader'}), (b:Folder{name:'iur_backup_folder'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Sqs{name:'iur_test_accelerators'}), (b: {name:'test_accelerators'})
+create (a)-[:SENDS_TO]->(b);
+
+match (a:Service{name:'AWS redrive'}), (b:Application{name:'panoramix'})
+create (a)-[:READS_FROM]->(b);
+
+match (a:Service{name:'test_accelerators'}), (b:Application{name:'panoramix_staging'})
+create (a)-[:SENDS_TO]->(b);
+
 
 ----
 
